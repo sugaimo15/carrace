@@ -143,7 +143,8 @@ export class Game {
     const el = document.getElementById('countdown')!
     el.style.opacity = '1'
     el.style.fontSize = 'clamp(30px,8vw,60px)'
-    el.textContent = lap >= TOTAL_LAPS ? 'FINAL LAP!' : `LAP ${lap + 1}`
+    // lap is the just-completed lap count; lap === TOTAL_LAPS-1 means next is the final lap
+    el.textContent = lap >= TOTAL_LAPS - 1 ? 'FINAL LAP!' : `LAP ${lap + 1}`
     el.style.color = '#FFD700'
     setTimeout(() => {
       el.style.opacity = '0'
