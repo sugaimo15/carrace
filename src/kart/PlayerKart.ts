@@ -10,6 +10,6 @@ export class PlayerKart extends KartBase {
 
   update(dt: number): void {
     this.applyInput(inputState, dt)
-    this.syncMesh()
+    this.syncMesh(dt)
   }
 }

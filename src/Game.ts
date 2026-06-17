@@ -84,6 +84,9 @@ export class Game {
       const grid = GRID_POSITIONS[i]!
       this.allKarts[i]!.position.copy(grid.pos)
       this.allKarts[i]!.angle = grid.angle
+      // Pre-compute trackT so CheckpointSystem.register() gets the correct lastT,
+      // preventing all checkpoints from being "crossed" on the first update frame.
+      this.allKarts[i]!.trackT = this.trackPath.getClosestT(this.allKarts[i]!.position)
     }
 
     for (const k of this.allKarts) {

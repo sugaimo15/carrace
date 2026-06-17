@@ -36,12 +36,15 @@ export const TRACK_CONTROL_POINTS: THREE.Vector3[] = [
   new THREE.Vector3(  -5,  0,   15),   // 28 back toward start
 ]
 
-// Starting grid positions (world-space) with forward direction
+// Starting grid positions just after the start/finish line (t≈0.01).
+// Placing karts here gives correct standings from the first frame and ensures
+// getClosestT returns low t-values, which the standings sort handles correctly.
+// angle=0 → forward is -Z, matching the track's first segment (0,0,0)→(20,0,-50).
 export const GRID_POSITIONS = [
-  { pos: new THREE.Vector3(  6, 0.4,  10), angle: Math.PI },  // player (P1) - left front
-  { pos: new THREE.Vector3( -6, 0.4,  10), angle: Math.PI },  // AI 1  - right front
-  { pos: new THREE.Vector3(  6, 0.4,  24), angle: Math.PI },  // AI 2  - left rear
-  { pos: new THREE.Vector3( -6, 0.4,  24), angle: Math.PI },  // AI 3  - right rear
+  { pos: new THREE.Vector3(  1, 0.4,  -6), angle: 0 },  // player (P1) - left front
+  { pos: new THREE.Vector3(  7, 0.4,  -6), angle: 0 },  // AI 1  - right front
+  { pos: new THREE.Vector3(  1, 0.4, -16), angle: 0 },  // AI 2  - left rear
+  { pos: new THREE.Vector3(  7, 0.4, -16), angle: 0 },  // AI 3  - right rear
 ] as const
 
 // Positions for item boxes along the track (track-T values)

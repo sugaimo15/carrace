@@ -21,7 +21,7 @@ export class AIKart extends KartBase {
   }
 
   update(dt: number): void {
-    if (this.finished) { this.syncMesh(); return }
+    if (this.finished) { this.syncMesh(dt); return }
 
     const currentT  = this.trackPath.getClosestT(this.position)
     const targetT   = (currentT + this.lookahead) % 1
@@ -56,6 +56,6 @@ export class AIKart extends KartBase {
     }
 
     this.applyInput(input, dt)
-    this.syncMesh()
+    this.syncMesh(dt)
   }
 }

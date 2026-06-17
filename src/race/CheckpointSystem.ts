@@ -66,7 +66,10 @@ export class CheckpointSystem {
       // No wrap-around
       return last < cpT && cpT <= cur
     } else {
-      // Wrapped past 1→0 boundary
+      // last > cur: either genuine forward wrap (0.99→0.01) or tiny backward
+      // numerical noise from getClosestT (0.990→0.989). A real wrap has
+      // last-cur ≈ 1; noise has last-cur ≈ 0.001. Reject noise.
+      if (last - cur < 0.5) return false
       return cpT > last || cpT <= cur
     }
   }

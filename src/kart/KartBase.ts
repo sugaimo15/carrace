@@ -126,7 +126,7 @@ export abstract class KartBase {
     }
 
     this.advancePosition(dt)
-    this.resolveTrackBoundary()
+    this.resolveTrackBoundary(dt)
   }
 
   private advancePosition(dt: number): void {
@@ -138,7 +138,7 @@ export abstract class KartBase {
     this.position.y = 0.4   // flat ground
   }
 
-  private resolveTrackBoundary(): void {
+  private resolveTrackBoundary(dt: number): void {
     const t     = this.trackPath.getClosestT(this.position)
     const lateral = this.trackPath.getLateralOffset(this.position, t)
     const hw    = TRACK_WIDTH / 2
@@ -153,8 +153,8 @@ export abstract class KartBase {
       this.speed    *= WALL_BOUNCE
       this.sideSlip *= WALL_BOUNCE
     } else if (Math.abs(lateral) > hw * 0.85) {
-      // Slowing on curb
-      this.speed = lerp(this.speed, 0, GRASS_DRAG * 0.05)
+      // Slowing on curb — frame-rate independent deceleration
+      this.speed = lerp(this.speed, 0, Math.min(1, GRASS_DRAG * dt))
     }
   }
 
@@ -169,7 +169,7 @@ export abstract class KartBase {
     this.speed    *= 0.3
   }
 
-  syncMesh(): void {
+  syncMesh(dt = 0.016): void {
     this.mesh.position.copy(this.position)
     this.mesh.rotation.y = this.angle
 
@@ -178,12 +178,12 @@ export abstract class KartBase {
       this.bodyMesh.rotation.z = lerp(
         this.bodyMesh.rotation.z,
         this.drifting ? -this.driftDir * 0.12 : 0,
-        8 * 0.016,
+        8 * dt,
       )
     }
 
     // Wheel roll
-    this.wheelRoll += (this.speed / 0.35) * 0.016
+    this.wheelRoll += (this.speed / 0.35) * dt
     for (const w of this.wheelMeshes) {
       w.rotation.x = this.wheelRoll
     }
