@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>CarRace</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #1a1a2e; }
+
+    #game-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    #hud {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      font-family: 'Arial Black', Arial, sans-serif;
+      color: white;
+    }
+
+    #touch-controls {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+    }
+
+    .touch-btn {
+      position: absolute;
+      pointer-events: all;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+      background: rgba(255,255,255,0.20);
+      border: 3px solid rgba(255,255,255,0.45);
+      border-radius: 16px;
+      color: white;
+      font-family: 'Arial Black', Arial, sans-serif;
+      font-size: 22px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.1s;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.8);
+    }
+    .touch-btn.active {
+      background: rgba(255,255,255,0.45);
+    }
+
+    #overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      font-family: 'Arial Black', Arial, sans-serif;
+      z-index: 100;
+    }
+    #overlay h1 {
+      font-size: clamp(36px, 8vw, 72px);
+      text-shadow: 0 4px 12px rgba(0,0,0,0.8);
+      margin-bottom: 16px;
+    }
+    #overlay p {
+      font-size: clamp(14px, 3vw, 22px);
+      opacity: 0.85;
+    }
+    #overlay.hidden { display: none; }
+
+    #countdown {
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: clamp(60px, 15vw, 120px);
+      font-family: 'Arial Black', Arial, sans-serif;
+      font-weight: 900;
+      color: #FFD700;
+      text-shadow: 0 0 30px rgba(255,215,0,0.8), 0 4px 8px rgba(0,0,0,0.8);
+      pointer-events: none;
+      z-index: 99;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+
+    #results {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.85);
+      color: white;
+      font-family: 'Arial Black', Arial, sans-serif;
+      z-index: 100;
+      display: none;
+    }
+    #results h2 { font-size: clamp(28px, 6vw, 52px); margin-bottom: 20px; color: #FFD700; }
+    #results table { border-collapse: collapse; font-size: clamp(14px, 2.5vw, 22px); }
+    #results td { padding: 6px 20px; border-bottom: 1px solid rgba(255,255,255,0.2); }
+    #results td:first-child { text-align: right; padding-right: 12px; opacity: 0.7; }
+    #results button {
+      margin-top: 28px;
+      padding: 12px 40px;
+      font-family: 'Arial Black', Arial, sans-serif;
+      font-size: 18px;
+      background: #FFD700;
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 900;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="game-canvas"></canvas>
+  <div id="hud"></div>
+  <div id="touch-controls"></div>
+
+  <div id="overlay">
+    <h1>🏎 CarRace</h1>
+    <p>WASD / 矢印キー で操作 &nbsp;|&nbsp; Space でドリフト &nbsp;|&nbsp; L でアイテム使用</p>
+    <p style="margin-top:10px; font-size:clamp(12px,2.5vw,18px); opacity:0.7">タップで開始</p>
+  </div>
+
+  <div id="countdown"></div>
+  <div id="results"></div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
