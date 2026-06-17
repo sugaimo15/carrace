@@ -13,8 +13,24 @@ export function buildTrackScene(trackPath: TrackPath, scene: THREE.Scene): void 
 }
 
 function buildGround(scene: THREE.Scene): void {
+  const canvas = document.createElement('canvas')
+  canvas.width = 256
+  canvas.height = 256
+  const ctx = canvas.getContext('2d')!
+  const tileSize = 32
+  for (let row = 0; row < canvas.height / tileSize; row++) {
+    for (let col = 0; col < canvas.width / tileSize; col++) {
+      ctx.fillStyle = (row + col) % 2 === 0 ? '#4a7c3f' : '#3a6230'
+      ctx.fillRect(col * tileSize, row * tileSize, tileSize, tileSize)
+    }
+  }
+  const tex = new THREE.CanvasTexture(canvas)
+  tex.wrapS = THREE.RepeatWrapping
+  tex.wrapT = THREE.RepeatWrapping
+  tex.repeat.set(40, 40)
+
   const geo = new THREE.PlaneGeometry(800, 800)
-  const mat = new THREE.MeshLambertMaterial({ color: 0x4a7c3f })
+  const mat = new THREE.MeshLambertMaterial({ map: tex })
   const mesh = new THREE.Mesh(geo, mat)
   mesh.rotation.x = -Math.PI / 2
   mesh.position.y = -0.05
@@ -58,13 +74,62 @@ function buildRoad(trackPath: TrackPath, scene: THREE.Scene): void {
   geo.setAttribute('uv',       new THREE.Float32BufferAttribute(uvs,       2))
   geo.setIndex(indices)
 
-  const mat = new THREE.MeshLambertMaterial({ color: 0x333333 })
+  const roadCanvas = document.createElement('canvas')
+  roadCanvas.width = 64
+  roadCanvas.height = 64
+  const rctx = roadCanvas.getContext('2d')!
+  rctx.fillStyle = '#555555'
+  rctx.fillRect(0, 0, 64, 64)
+  // subtle asphalt grain
+  for (let i = 0; i < 300; i++) {
+    const x = Math.random() * 64
+    const y = Math.random() * 64
+    const v = Math.floor(Math.random() * 30 + 60)
+    rctx.fillStyle = `rgb(${v},${v},${v})`
+    rctx.fillRect(x, y, 1, 1)
+  }
+  const roadTex = new THREE.CanvasTexture(roadCanvas)
+  roadTex.wrapS = THREE.RepeatWrapping
+  roadTex.wrapT = THREE.RepeatWrapping
+  roadTex.repeat.set(2, 30)
+
+  const mat = new THREE.MeshLambertMaterial({ map: roadTex })
   const mesh = new THREE.Mesh(geo, mat)
   mesh.receiveShadow = true
   scene.add(mesh)
 
+  buildCenterLine(trackPath, scene)
   // Curb stripes (alternating red/white)
   buildCurbs(trackPath, scene, hw)
+}
+
+function buildCenterLine(trackPath: TrackPath, scene: THREE.Scene): void {
+  const N   = TRACK_SEGMENTS
+  const DW  = 0.4  // dashed line width
+
+  for (let i = 0; i < N; i++) {
+    // Draw only every other segment for a dashed effect
+    if (i % 4 !== 0) continue
+
+    const t0 = i / N
+    const t1 = (i + 1.8) / N
+    const p0 = trackPath.getPointAt(t0)
+    const p1 = trackPath.getPointAt(Math.min(t1, 1))
+    const tang = trackPath.getTangentAt(t0)
+    const right = new THREE.Vector3().crossVectors(tang, UP).normalize()
+
+    const len = p0.distanceTo(p1)
+    const mid = p0.clone().lerp(p1, 0.5)
+
+    const geo = new THREE.PlaneGeometry(DW, len)
+    const mat = new THREE.MeshLambertMaterial({ color: 0xffffff })
+    const mesh = new THREE.Mesh(geo, mat)
+    mesh.rotation.x = -Math.PI / 2
+    mesh.position.set(mid.x, 0.02, mid.z)
+    const angle = Math.atan2(tang.x, tang.z)
+    mesh.rotation.z = -angle
+    scene.add(mesh)
+  }
 }
 
 function buildCurbs(trackPath: TrackPath, scene: THREE.Scene, hw: number): void {
